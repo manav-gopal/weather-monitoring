@@ -11,8 +11,7 @@
         "maxDuration": 60
       }
     },
-    "cron": {
-      "jobs": [
+    "cron": [
         {
           "path": "/api/fetchRealTimeWeatherData",
           "schedule": "*/5 * * * *"
@@ -22,6 +21,5 @@
           "schedule": "0 0 * * *"
         }
       ]
-    }
   }
   
