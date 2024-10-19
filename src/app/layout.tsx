@@ -4,7 +4,6 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
-import startCronJob from "@/server/jobs/weatherJob";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -15,10 +14,6 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Start the cron job when the layout is loaded
-  if (typeof window === 'undefined') {
-    startCronJob();
-  }
   return (
     <html lang="en">
       <body className={GeistSans.className}>
