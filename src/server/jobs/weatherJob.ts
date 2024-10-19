@@ -156,8 +156,8 @@ const rollupDailyWeather = async () => {
   }
 };
 
-// Schedule real-time weather data fetching every 1 minutes
-const task1 = cron.schedule("* * * * *", () => {
+// Schedule real-time weather data fetching every 5 minutes
+const task1 = cron.schedule("*/5 * * * *", () => {
   console.log("Fetching real-time weather data...");
   saveRealTimeWeatherData()
     .catch((err) => console.error(err))
@@ -169,8 +169,7 @@ const task1 = cron.schedule("* * * * *", () => {
 task1.start();
 
 // Schedule daily rollup at midnight
-const task2 = cron.schedule("* * * * *", () => {
-  // 0 0 * * *
+const task2 = cron.schedule("0 0 * * *", () => {
   rollupDailyWeather().catch((err) => console.error(err));
 });
 
