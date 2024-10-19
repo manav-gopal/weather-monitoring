@@ -30,14 +30,6 @@ export const env = createEnv({
     MONGODB_URI: process.env.MONGODB_URI, // Add MongoDB URI for server-side use
     OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY, // Add OpenWeatherMap API key for server-side use
   },
-  /**
-   * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
-   * useful for Docker builds.
-   */
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
-  /**
-   * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
-   * `SOME_VAR=''` will throw an error.
-   */
+  skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
   emptyStringAsUndefined: true,
 });
