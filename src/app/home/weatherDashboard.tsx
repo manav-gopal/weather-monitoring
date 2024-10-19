@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/trpc/react";
+import styles from "@/styles/WeatherDashboard.module.scss";
 
 // Define types for the data structures
 interface WeatherUpdate {
@@ -28,7 +29,7 @@ const WeatherDashboard = () => {
   // State variables for daily summary
   const defaultDate = new Date().toISOString().split("T")[0] ?? "2000-12-12";
   const [dailySummaryCity, setDailySummaryCity] = useState<string>("Delhi");
-  const [dailySummaryDate, setDailySummaryDate] = useState<string>(defaultDate); // Format as 'YYYY-MM-DD'
+  const [dailySummaryDate, setDailySummaryDate] = useState<string>(defaultDate);
 
   // Fetch data using TRPC hooks
   const { data: currentWeather, isLoading: weatherLoading } =
@@ -41,116 +42,97 @@ const WeatherDashboard = () => {
   } = api.weather.getDailySummary.useQuery<CitySummary | null>(
     { city: dailySummaryCity, date: dailySummaryDate },
     {
-      enabled: !!dailySummaryCity && !!dailySummaryDate, // Only fetch when both are selected
+      enabled: !!dailySummaryCity && !!dailySummaryDate,
     }
   );
 
   return (
-    <div>
-      <h1>Weather Dashboard</h1>
+    <div className={styles.weatherDashboard}>
+      <h1 className={styles.title}>Weather Dashboard</h1>
 
-      {/* Select City for Current Weather */}
-      <div>
-        <label>
-          Select City for Current Weather:
-          <select value={city} onChange={(e) => setCity(e.target.value)}>
-            <option value="Delhi">Delhi</option>
-            <option value="Mumbai">Mumbai</option>
-            <option value="Chennai">Chennai</option>
-            <option value="Bangalore">Bangalore</option>
-            <option value="Kolkata">Kolkata</option>
-            <option value="Hyderabad">Hyderabad</option>
-          </select>
-        </label>
-      </div>
-
-      {/* Current Weather */}
-      {weatherLoading ? (
-        <p>Loading current weather...</p>
-      ) : currentWeather ? (
-        <div>
-          <h2>Current Weather in {currentWeather.city}</h2>
-          <p>Temperature: {currentWeather.temp}°C</p>
-          <p>Feels Like: {currentWeather.feels_like}°C</p>
-          <p>Condition: {currentWeather.main}</p>
-          <p>
-            Updated at: {new Date(currentWeather.timestamp).toLocaleString()}
-          </p>
-        </div>
-      ) : (
-        <p>Failed to fetch current weather data.</p>
-      )}
-
-      {/* Daily Summary */}
-      <h2>Daily Summary</h2>
-
-      {/* Select City and Date for Daily Summary */}
-      <div>
-        <label>
-          City:
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Current Weather</h2>
+        <div className={styles.selectWrapper}>
+          <label htmlFor="currentCity">Select City:</label>
           <select
-            value={dailySummaryCity}
-            onChange={(e) => setDailySummaryCity(e.target.value)}
+            id="currentCity"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className={styles.select}
           >
-            <option value="Delhi">Delhi</option>
-            <option value="Mumbai">Mumbai</option>
-            <option value="Chennai">Chennai</option>
-            <option value="Bangalore">Bangalore</option>
-            <option value="Kolkata">Kolkata</option>
-            <option value="Hyderabad">Hyderabad</option>
+            {["Delhi", "Mumbai", "Chennai", "Bangalore", "Kolkata", "Hyderabad"].map((cityOption) => (
+              <option key={cityOption} value={cityOption}>{cityOption}</option>
+            ))}
           </select>
-        </label>
-        <label>
-          Date:
-          <input
-            type="date"
-            value={dailySummaryDate}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setDailySummaryDate(e.target.value)
-            }
-            min="2024-10-18" // Minimum date allowed
-            max={new Date().toISOString().split('T')[0]} // Maximum date allowed
-          />
-        </label>
+        </div>
+
+        {weatherLoading ? (
+          <p className={styles.loading}>Loading current weather...</p>
+        ) : currentWeather ? (
+          <div className={styles.weatherCard}>
+            <h3>{currentWeather.city}</h3>
+            <p className={styles.temperature}>{currentWeather.temp}°C</p>
+            <p>Feels Like: {currentWeather.feels_like}°C</p>
+            <p>Condition: {currentWeather.main}</p>
+            <p className={styles.timestamp}>
+              Updated: {new Date(currentWeather.timestamp).toLocaleString()}
+            </p>
+          </div>
+        ) : (
+          <p className={styles.error}>Failed to fetch current weather data.</p>
+        )}
       </div>
 
-      {/* Daily Summary Data */}
-      {summaryLoading ? (
-        <p>Loading daily summary...</p>
-      ) : summaryError ? (
-        <p>Error fetching daily summary: {summaryError.message}</p>
-      ) : summaryData ? (
-        <div>
-          <h4>
-            {dailySummaryCity} on{" "}
-            {new Date(summaryData.date).toLocaleDateString()}
-          </h4>
-          <p>
-            Average Temperature:{" "}
-            {summaryData.averageTemp !== null
-              ? summaryData.averageTemp.toFixed(2)
-              : "N/A"}
-            °C
-          </p>
-          <p>
-            Max Temperature:{" "}
-            {summaryData.maxTemp !== null
-              ? summaryData.maxTemp.toFixed(2)
-              : "N/A"}
-            °C
-          </p>
-          <p>
-            Min Temperature:{" "}
-            {summaryData.minTemp !== null
-              ? summaryData.minTemp.toFixed(2)
-              : "N/A"}
-            °C
-          </p>
-          <p>Dominant Condition: {summaryData.dominantCondition ?? "N/A"}</p>
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Daily Summary</h2>
+        <div className={styles.summaryControls}>
+          <div className={styles.selectWrapper}>
+            <label htmlFor="summaryCity">City:</label>
+            <select
+              id="summaryCity"
+              value={dailySummaryCity}
+              onChange={(e) => setDailySummaryCity(e.target.value)}
+              className={styles.select}
+            >
+              {["Delhi", "Mumbai", "Chennai", "Bangalore", "Kolkata", "Hyderabad"].map((cityOption) => (
+                <option key={cityOption} value={cityOption}>{cityOption}</option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.selectWrapper}>
+            <label htmlFor="summaryDate">Date:</label>
+            <input
+              id="summaryDate"
+              type="date"
+              value={dailySummaryDate}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDailySummaryDate(e.target.value)
+              }
+              min="2024-10-18"
+              max={new Date().toISOString().split('T')[0]}
+              className={styles.dateInput}
+            />
+          </div>
         </div>
-      ) : (
-        <p>No summary available for the selected city and date.</p>
-      )}
+
+        {summaryLoading ? (
+          <p className={styles.loading}>Loading daily summary...</p>
+        ) : summaryError ? (
+          <p className={styles.error}>Error fetching daily summary: {summaryError.message}</p>
+        ) : summaryData ? (
+          <div className={styles.summaryCard}>
+            <h3>{dailySummaryCity} on {new Date(summaryData.date).toLocaleDateString()}</h3>
+            <div className={styles.summaryDetails}>
+              <p>Average Temp: {summaryData.averageTemp !== null ? `${summaryData.averageTemp.toFixed(2)}°C` : "N/A"}</p>
+              <p>Max Temp: {summaryData.maxTemp !== null ? `${summaryData.maxTemp.toFixed(2)}°C` : "N/A"}</p>
+              <p>Min Temp: {summaryData.minTemp !== null ? `${summaryData.minTemp.toFixed(2)}°C` : "N/A"}</p>
+              <p>Dominant Condition: {summaryData.dominantCondition ?? "N/A"}</p>
+            </div>
+          </div>
+        ) : (
+          <p className={styles.noData}>No summary available for the selected city and date.</p>
+        )}
+      </div>
     </div>
   );
 };
