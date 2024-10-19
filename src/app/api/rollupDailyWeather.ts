@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import connectDB from '@/lib/db';
-import DailyWeatherSummary from '@/models/Weather';
+import connectDB from '../../lib/db';
+import DailyWeatherSummary from '../../models/Weather';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

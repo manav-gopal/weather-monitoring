@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import fetchWeatherData from '@/lib/weather';
-import connectDB from '@/lib/db';
-import DailyWeatherSummary from '@/models/Weather';
+import fetchWeatherData from '../../lib/weather';
+import connectDB from '../../lib/db';
+import DailyWeatherSummary from '../../models/Weather';
 
 const CITIES = ['Delhi', 'Mumbai', 'Chennai', 'Bangalore', 'Kolkata', 'Hyderabad'];
 
