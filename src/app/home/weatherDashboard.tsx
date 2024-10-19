@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@/trpc/react";
 import styles from "@/styles/WeatherDashboard.module.scss";
 
@@ -25,6 +25,7 @@ interface CitySummary {
 
 const WeatherDashboard = () => {
   const [city, setCity] = useState<string>("Delhi");
+  const [threshold, setThreshold] = useState<number>(30);
 
   // State variables for daily summary
   const defaultDate = new Date().toISOString().split("T")[0] ?? "2000-12-12";
@@ -45,6 +46,9 @@ const WeatherDashboard = () => {
       enabled: !!dailySummaryCity && !!dailySummaryDate,
     }
   );
+  const { data: alertData, isLoading: thresholdLoading } =
+    api.weather.checkThreshold.useQuery({ city, threshold });
+    if (alertData?.alert) console.log(alertData?.alert);
 
   return (
     <div className={styles.weatherDashboard}>
@@ -60,10 +64,31 @@ const WeatherDashboard = () => {
             onChange={(e) => setCity(e.target.value)}
             className={styles.select}
           >
-            {["Delhi", "Mumbai", "Chennai", "Bangalore", "Kolkata", "Hyderabad"].map((cityOption) => (
-              <option key={cityOption} value={cityOption}>{cityOption}</option>
+            {[
+              "Delhi",
+              "Mumbai",
+              "Chennai",
+              "Bangalore",
+              "Kolkata",
+              "Hyderabad",
+            ].map((cityOption) => (
+              <option key={cityOption} value={cityOption}>
+                {cityOption}
+              </option>
             ))}
           </select>
+        </div>
+
+        {/* Threshold input */}
+        <div className={styles.selectWrapper}>
+          <label htmlFor="threshold">Set Temperature Threshold (°C):</label>
+          <input
+            id="threshold"
+            type="number"
+            value={threshold}
+            onChange={(e) => setThreshold(Number(e.target.value))}
+            className={styles.input}
+          />
         </div>
 
         {weatherLoading ? (
@@ -94,8 +119,17 @@ const WeatherDashboard = () => {
               onChange={(e) => setDailySummaryCity(e.target.value)}
               className={styles.select}
             >
-              {["Delhi", "Mumbai", "Chennai", "Bangalore", "Kolkata", "Hyderabad"].map((cityOption) => (
-                <option key={cityOption} value={cityOption}>{cityOption}</option>
+              {[
+                "Delhi",
+                "Mumbai",
+                "Chennai",
+                "Bangalore",
+                "Kolkata",
+                "Hyderabad",
+              ].map((cityOption) => (
+                <option key={cityOption} value={cityOption}>
+                  {cityOption}
+                </option>
               ))}
             </select>
           </div>
@@ -109,7 +143,7 @@ const WeatherDashboard = () => {
                 setDailySummaryDate(e.target.value)
               }
               min="2024-10-18"
-              max={new Date().toISOString().split('T')[0]}
+              max={new Date().toISOString().split("T")[0]}
               className={styles.dateInput}
             />
           </div>
@@ -118,19 +152,43 @@ const WeatherDashboard = () => {
         {summaryLoading ? (
           <p className={styles.loading}>Loading daily summary...</p>
         ) : summaryError ? (
-          <p className={styles.error}>Error fetching daily summary: {summaryError.message}</p>
+          <p className={styles.error}>
+            Error fetching daily summary: {summaryError.message}
+          </p>
         ) : summaryData ? (
           <div className={styles.summaryCard}>
-            <h3>{dailySummaryCity} on {new Date(summaryData.date).toLocaleDateString()}</h3>
+            <h3>
+              {dailySummaryCity} on{" "}
+              {new Date(summaryData.date).toLocaleDateString()}
+            </h3>
             <div className={styles.summaryDetails}>
-              <p>Average Temp: {summaryData.averageTemp !== null ? `${summaryData.averageTemp.toFixed(2)}°C` : "N/A"}</p>
-              <p>Max Temp: {summaryData.maxTemp !== null ? `${summaryData.maxTemp.toFixed(2)}°C` : "N/A"}</p>
-              <p>Min Temp: {summaryData.minTemp !== null ? `${summaryData.minTemp.toFixed(2)}°C` : "N/A"}</p>
-              <p>Dominant Condition: {summaryData.dominantCondition ?? "N/A"}</p>
+              <p>
+                Average Temp:{" "}
+                {summaryData.averageTemp !== null
+                  ? `${summaryData.averageTemp.toFixed(2)}°C`
+                  : "N/A"}
+              </p>
+              <p>
+                Max Temp:{" "}
+                {summaryData.maxTemp !== null
+                  ? `${summaryData.maxTemp.toFixed(2)}°C`
+                  : "N/A"}
+              </p>
+              <p>
+                Min Temp:{" "}
+                {summaryData.minTemp !== null
+                  ? `${summaryData.minTemp.toFixed(2)}°C`
+                  : "N/A"}
+              </p>
+              <p>
+                Dominant Condition: {summaryData.dominantCondition ?? "N/A"}
+              </p>
             </div>
           </div>
         ) : (
-          <p className={styles.noData}>No summary available for the selected city and date.</p>
+          <p className={styles.noData}>
+            No summary available for the selected city and date.
+          </p>
         )}
       </div>
     </div>

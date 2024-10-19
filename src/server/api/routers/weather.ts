@@ -80,7 +80,7 @@ export const weatherRouter = createTRPCRouter({
   // Trigger an alert based on thresholds
   checkThreshold: publicProcedure
     .input(z.object({ city: z.string(), threshold: z.number() }))
-    .mutation(async ({ input }) => {
+    .query(async ({ input }) => {
       const { city, threshold } = input;
       try {
         const weather = await fetchWeatherData(city);
